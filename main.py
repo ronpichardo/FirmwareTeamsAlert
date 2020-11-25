@@ -35,7 +35,7 @@ if config['lastUpdated'] != firmware_date:
 
   # Re-open the file so that we can write our previous file with the new updated firmware date
   updateFile = open('config.json', 'w')
-  updateFile.write(json.dumps(config))
+  updateFile.write(json.dumps(config, indent=4))
   updateFile.close()
 
 else:
@@ -72,11 +72,11 @@ for owned in my_devices:
         # locally
         send_to_teams.append(owned)
         # We also print out to the console the updates that was found
-        print('Update found for: ' + updated)
+        print('Update found: ' + updated)
 
 
 # if we found devices that matched what we are searching for
 # a Notification will be sent to the channel that the Microsoft Teams Webhook was added to
-if len(send_to_teams) > 0:
+if len(send_to_teams) > 0 and teamUri != "":
   alertResult = alertTeam.sendNotification(len(send_to_teams))
   print(alertResult)
