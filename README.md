@@ -15,6 +15,8 @@ Instructions for integrating a webhook in Microsoft Teams can be found at this l
 
 https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using#setting-up-a-custom-incoming-webhook
 
+![TeamsWebhook](https://user-images.githubusercontent.com/63974878/104045437-8d31ad80-51ac-11eb-8959-5dee1928c00e.png)
+
 ## Installation
 Python Version: 3.7
 Required Libraries : Requests, lxml, BeautifulSoup4
