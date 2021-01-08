@@ -1,5 +1,5 @@
 # FirmwareTeamsAlert
-
+## Overview
 Python script created to check the Crestron website for new firmwares.
 Locates if a new firmware was found for the following device:
 - NVX
@@ -10,6 +10,31 @@ Locates if a new firmware was found for the following device:
 - RMC3
 
 Requirements:
-a Webhook created in a Microsoft Teams Channel ( WIP - How To Guide )
-Python version 3.7
-Requests, BeautifulSoup and lxml installed via pip
+a Webhook created in a Microsoft Teams Channel ,if no Microsoft Teams Webhook is in use, it will just print to the console
+Instructions for integrating a webhook in Microsoft Teams can be found at this link:
+
+https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using#setting-up-a-custom-incoming-webhook
+
+## Installation
+Python Version: 3.7
+Required Libraries : Requests, lxml, BeautifulSoup4
+
+For Mac/Linux
+
+```shell
+$ git clone https://github.com/ronpichardo/FirmwareTeamsAlert.git
+$ cd FirmwareTeamsAlert
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+```
+
+For Windows using Powershell
+
+```shell
+$ git clone https://github.com/ronpichardo/FirmwareTeamsAlert.git
+$ cd FirmwareTeamsAlert
+$ python3 -m venv venv
+$ ./venv/bin/Activate.ps1
+$ pip install -r requirements.txt
+```
