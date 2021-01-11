@@ -9,6 +9,9 @@ Locates if a new firmware was found for the following device:
 - MC4
 - RMC3
 
+Example of the output if you do use the Microsoft Teams Alerting:
+<img width="624" alt="Screen Shot 2021-01-11 at 8 21 45 AM" src="https://user-images.githubusercontent.com/63974878/104231294-bfe1dd00-541c-11eb-9443-35b46f2a7546.png">
+
 Requirements:
 a Webhook created in a Microsoft Teams Channel ,if no Microsoft Teams Webhook is in use, it will just print to the console
 Instructions for integrating a webhook in Microsoft Teams can be found at this link:
