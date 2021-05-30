@@ -1,8 +1,10 @@
 import requests
 from bs4 import BeautifulSoup as soup
 import os, json, sys
+import logging
 
-from classes.Teams import Teams
+from classes.alerts import Teams
+# from classes.crestron import Crestron
 
 main_url = 'https://www.crestron.com/Support/Search-Results?c=4'
 my_devices = ['NVX', 'CP3', 'CP3N', 'RMC3', 'PRO3', 'AV3', 'CP4', 'CP4N', 'MC4']
@@ -17,13 +19,16 @@ with open('config.json') as json_data:
   teamUri = config['teamsUri']
 
 # print(todays_date)
-alertTeam = Teams(teamUri)
+alertTeam = Teams(teamUri) if teamUri != "" else print('TeamsAlert will not be sent')
 
 init_request = s.get(main_url)
 fwsource = soup(init_request.text, 'lxml')
 devices = fwsource.findAll('div', 'search-result')
 
 device_firmwares = []
+
+# Date example of how it is displayed on the page is May 04, 2021, so we grab the newest items
+# date in order to compare on the following lines
 firmware_date = devices[0].find('p', 'resource-search-date').text.strip()
 
 # We check that if our last date is not equal to the latest update on the website
@@ -52,6 +57,7 @@ for device in devices:
   device_name = device.find('div', 'resource-search-name').text.strip()
   fwDate = device.find('p', 'resource-search-date').text.strip()
 
+  # print(device_name)
   # save the results to another list with just the device names from the 
   # resource-search-name tag
   updated_devices.append(device_name)
@@ -60,7 +66,6 @@ for device in devices:
 for owned in my_devices:
   # Loop through the updates that were found
   for updated in updated_devices:
-
     # There are Home devices which include a '-R' in the name, ex CP4-R
     # Enterprises dont utilize Home devices, so we ignore those updates
     if owned in updated:
@@ -72,11 +77,11 @@ for owned in my_devices:
         # locally
         send_to_teams.append(owned)
         # We also print out to the console the updates that was found
-        print('Update found: ' + updated)
+        print('%s update found: %s' % (owned,updated))
 
 
 # if we found devices that matched what we are searching for
 # a Notification will be sent to the channel that the Microsoft Teams Webhook was added to
 if len(send_to_teams) > 0 and teamUri != "":
-  alertResult = alertTeam.sendNotification(len(send_to_teams))
+  alertResult = alertTeam.send_notification(len(send_to_teams))
   print(alertResult)
