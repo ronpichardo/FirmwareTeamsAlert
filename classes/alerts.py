@@ -7,7 +7,7 @@ class Teams:
   def __init__(self, baseUrl):
     self._baseUrl = baseUrl
 
-  def sendNotification(self, numOfUpdates):
+  def send_notification(self, numOfUpdates):
     payload = {
       "@type": "MessageCard",
       "@context": "http://schema.org/extensions",
