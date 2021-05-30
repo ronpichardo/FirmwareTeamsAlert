@@ -31,7 +31,7 @@ $ git clone https://github.com/ronpichardo/FirmwareTeamsAlert.git
 $ cd FirmwareTeamsAlert
 $ python3 -m venv venv
 $ source venv/bin/activate
-$ pip install -r requirements.txt
+(venv) $ pip install -r requirements.txt
 ```
 
 For Windows using Powershell
@@ -41,5 +41,14 @@ $ git clone https://github.com/ronpichardo/FirmwareTeamsAlert.git
 $ cd FirmwareTeamsAlert
 $ python3 -m venv venv
 $ ./venv/bin/Activate.ps1
-$ pip install -r requirements.txt
+(venv) $ pip install -r requirements.txt
 ```
+
+## Usage
+Once you are inside your VirtualEnvironment, to confirm you're in venv, you should see (venv) in front of your shell
+```shell
+$ source venv/bin/activate
+(venv) $ python main.py
+```
+
+You will see output to the screen notifying you of updated firmware if found, or non found.  The date will be saved in the config folder in order to track updates.
