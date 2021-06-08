@@ -37,11 +37,11 @@ firmware_date = devices[0].find('p', 'resource-search-date').text.strip()
 if config['lastUpdated'] != firmware_date:
   # Changes the lastUpdated feild in the config file to the new date found on the website
   config['lastUpdated'] = firmware_date
+  config['teamsUri'] = teamUri
 
   # Re-open the file so that we can write our previous file with the new updated firmware date
-  updateFile = open('config.json', 'w')
-  updateFile.write(json.dumps(config, indent=4))
-  updateFile.close()
+  with open('config.json', 'w') as updated_file:
+    updated_file.write(json.dumps(config, indent=4))
 
 else:
   print('No new updates found')
@@ -56,11 +56,12 @@ for device in devices:
   # Example output of device_name is 'DM‐NVX‐D80‐IOAV 4.1.4472.00024_r381143'
   device_name = device.find('div', 'resource-search-name').text.strip()
   fwDate = device.find('p', 'resource-search-date').text.strip()
+  dl_link = device.find('a')['href']
 
   # print(device_name)
   # save the results to another list with just the device names from the 
   # resource-search-name tag
-  updated_devices.append(device_name)
+  updated_devices.append({'device': device_name, 'firmware': fwDate, 'link': 'https://www.crestron.com' + dl_link})
 
 # Loop through each of our devices to check against the recently found updates
 for owned in my_devices:
@@ -68,16 +69,16 @@ for owned in my_devices:
   for updated in updated_devices:
     # There are Home devices which include a '-R' in the name, ex CP4-R
     # Enterprises dont utilize Home devices, so we ignore those updates
-    if owned in updated:
+    if owned.lower() in updated['device'].lower():
       if '-R' in updated:
         pass
       else:
         # At the moment, we will add the found devices to a list
         # This can be output to a file with the device/firmware version to view
         # locally
-        send_to_teams.append(owned)
+        send_to_teams.append({'device': updated['device'], 'firmware': updated['firmware'], 'link': updated['link']})
         # We also print out to the console the updates that was found
-        print('%s update found: %s' % (owned,updated))
+        print('%s update found: %s' % (owned,updated['device']))
 
 
 # if we found devices that matched what we are searching for
