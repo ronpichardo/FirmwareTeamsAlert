@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup as soup
-import os, json, sys
+import os, json, sys, datetime
 import logging
 
 from classes.alerts import Teams
@@ -70,7 +70,7 @@ for owned in my_devices:
     # There are Home devices which include a '-R' in the name, ex CP4-R
     # Enterprises dont utilize Home devices, so we ignore those updates
     if owned.lower() in updated['device'].lower():
-      if '-R' in updated:
+      if '-R' in updated['device']:
         pass
       else:
         # At the moment, we will add the found devices to a list
@@ -80,7 +80,9 @@ for owned in my_devices:
         # We also print out to the console the updates that was found
         print('%s update found: %s' % (owned,updated['device']))
 
-
+timestamp = datetime.datetime.now().strftime('%b%d%Y')
+with open(f'{timestamp}updates.json', 'w') as firmwares:
+  firmwares.write(json.dumps(send_to_teams, indent=4))
 # if we found devices that matched what we are searching for
 # a Notification will be sent to the channel that the Microsoft Teams Webhook was added to
 if len(send_to_teams) > 0 and teamUri != "":
