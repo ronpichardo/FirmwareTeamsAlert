@@ -6,7 +6,8 @@ import logging
 from classes.alerts import Teams
 # from classes.crestron import Crestron
 
-main_url = 'https://www.crestron.com/Support/Search-Results?c=4'
+# main_url = 'https://www.crestron.com/Support/Search-Results?c=4'
+main_url = 'https://www.crestron.com/Support/Search-Results?c=4&m=25'
 my_devices = ['NVX', 'CP3', 'CP3N', 'RMC3', 'PRO3', 'AV3', 'CP4', 'CP4N', 'MC4']
 
 s = requests.Session()
@@ -15,11 +16,15 @@ s = requests.Session()
 with open('config.json') as json_data:
   config = json.load(json_data)
 
-  todays_date = config['lastUpdated']
+  check_date = config['lastUpdated']
   teamUri = config['teamsUri']
 
-# print(todays_date)
-alertTeam = Teams(teamUri) if teamUri != "" else print('TeamsAlert will not be sent')
+teams_alert = True if teamUri != "" else False
+
+if teams_alert:
+  alertTeam = Teams(teamUri) 
+else:
+  print('TeamsAlert will not be sent')
 
 init_request = s.get(main_url)
 fwsource = soup(init_request.text, 'lxml')
@@ -37,7 +42,6 @@ firmware_date = devices[0].find('p', 'resource-search-date').text.strip()
 if config['lastUpdated'] != firmware_date:
   # Changes the lastUpdated feild in the config file to the new date found on the website
   config['lastUpdated'] = firmware_date
-  config['teamsUri'] = teamUri
 
   # Re-open the file so that we can write our previous file with the new updated firmware date
   with open('config.json', 'w') as updated_file:
@@ -59,9 +63,12 @@ for device in devices:
   dl_link = device.find('a')['href']
 
   # print(device_name)
-  # save the results to another list with just the device names from the 
-  # resource-search-name tag
-  updated_devices.append({'device': device_name, 'firmware': fwDate, 'link': 'https://www.crestron.com' + dl_link})
+  if fwDate == check_date:
+    break
+  else:
+    # save the results to another list with just the device names from the 
+    # resource-search-name tag
+    updated_devices.append({'device': device_name, 'firmware': fwDate, 'link': 'https://www.crestron.com' + dl_link})
 
 # Loop through each of our devices to check against the recently found updates
 for owned in my_devices:
@@ -76,15 +83,23 @@ for owned in my_devices:
         # At the moment, we will add the found devices to a list
         # This can be output to a file with the device/firmware version to view
         # locally
-        send_to_teams.append({'device': updated['device'], 'firmware': updated['firmware'], 'link': updated['link']})
+        send_to_teams.append({'type': owned, 'device': updated['device'], 'firmware': updated['firmware'], 'link': updated['link']})
         # We also print out to the console the updates that was found
         print('%s update found: %s' % (owned,updated['device']))
 
-timestamp = datetime.datetime.now().strftime('%b%d%Y')
-with open(f'{timestamp}updates.json', 'w') as firmwares:
-  firmwares.write(json.dumps(send_to_teams, indent=4))
-# if we found devices that matched what we are searching for
-# a Notification will be sent to the channel that the Microsoft Teams Webhook was added to
-if len(send_to_teams) > 0 and teamUri != "":
-  alertResult = alertTeam.send_notification(len(send_to_teams))
-  print(alertResult)
+if len(send_to_teams) > 0:
+  timestamp = datetime.datetime.now().strftime('%b%d%Y')
+  with open(f'{timestamp}updates.json', 'w') as firmwares:
+    firmwares.write(json.dumps(send_to_teams, indent=4))
+  
+  devices = []
+  for device in send_to_teams:
+    devices.append(device['type'])
+
+  joined = ", ".join(devices)
+  print(joined)
+  # if we found devices that matched what we are searching for
+  # a Notification will be sent to the channel that the Microsoft Teams Webhook was added to
+  if teams_alert:
+    alertResult = alertTeam.send_notification(joined)
+    print(alertResult)
